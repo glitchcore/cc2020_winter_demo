@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
     while(1) {
         for(size_t y = 0; y < DISPLAY_HEIGHT; y++) {
             for(size_t x = 0; x < DISPLAY_WIDTH; x++) {
-                if(render_pixel) {
+                if(render_pixel()) {
                     printf("*");
                 } else {
                     printf(" ");
