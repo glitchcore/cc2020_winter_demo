@@ -22,6 +22,7 @@ uint32_t zebra_t = 0;
 /* text mode */
 
 uint8_t render_textmode(uint8_t x, uint8_t y);
+void update_text(uint32_t t);
 
 /* common */
 
@@ -53,14 +54,26 @@ void render_row(uint32_t t, uint8_t row_counter) {
 }
 
 void render_frame(uint32_t t) {
-    if(t > zebra_t + ZEBRA_PERIOD) {
-        zebra_t = t;
+    switch(mode) {
+        case ModeZebra:
+            if(t > zebra_t + ZEBRA_PERIOD) {
+                zebra_t = t;
 
-        zebra_phase++;
-        if(zebra_phase == ZEBRA_LENGTH + 1) {
-            zebra_phase = 1;
-        }
+                zebra_phase++;
+                if(zebra_phase == ZEBRA_LENGTH + 1) {
+                    zebra_phase = 1;
+                }
+            }
+        break;
+
+        case ModeText:
+            update_text(t);
+        break;
+
+        default:
+        break;
     }
+
 }
 
 uint8_t handle_tick() {

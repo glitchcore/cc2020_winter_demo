@@ -25,3 +25,12 @@ uint8_t render_textmode(uint8_t x, uint8_t y) {
 
     return render_char(x % CHAR_WIDTH, y % CHAR_HEIGHT, ch);
 }
+
+void update_text(uint32_t t) {
+    if(t % 1000 == 0) {
+        text[1]++;
+        if(text[1] == 'z') {
+            text[1] = '1';
+        }
+    }
+}
