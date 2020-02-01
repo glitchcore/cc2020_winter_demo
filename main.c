@@ -6,7 +6,7 @@
 
 #define clear() printf("\033[H\033[J")
 
-uint8_t render_pixel();
+uint8_t handle_tick();
 void init_render();
 
 int main(int argc, char const *argv[])
@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
     while(1) {
         for(size_t y = 0; y < DISPLAY_HEIGHT; y++) {
             for(size_t x = 0; x < DISPLAY_WIDTH; x++) {
-                if(render_pixel()) {
+                if(handle_tick()) {
                     printf("*");
                 } else {
                     printf(" ");
