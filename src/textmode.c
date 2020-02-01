@@ -17,7 +17,11 @@ uint8_t render_char(uint8_t x, uint8_t y, uint8_t ch) {
     }
 
     if(x == CHAR_WIDTH - 1) {
-        return 0; // margin right
+        return 0; // margin right 1 px
+    }
+
+    if(y == CHAR_HEIGHT - 1) {
+        return 0; // margin bottom 1 px
     }
 
     return (font[ch - ' '][x] & (1 << y)) >> y;
