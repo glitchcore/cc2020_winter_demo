@@ -17,8 +17,12 @@ int main(int argc, char const *argv[])
     while(1) {
         for(size_t y = 0; y < DISPLAY_HEIGHT; y++) {
             for(size_t x = 0; x < DISPLAY_WIDTH; x++) {
-                if(handle_tick()) {
+                uint8_t ch = handle_tick();
+
+                if(ch == 1) {
                     printf("*");
+                } else if(ch > 1){
+                    printf("%c", ch);
                 } else {
                     printf(" ");
                 }

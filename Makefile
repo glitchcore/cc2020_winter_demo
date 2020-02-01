@@ -6,7 +6,8 @@ BUILD_DIR = build
 
 C_SOURCES =  \
 demo.c \
-main.c
+main.c \
+textmode.c
 
 C_INCLUDES = \
 -I.

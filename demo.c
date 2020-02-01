@@ -5,10 +5,11 @@
 
 /* modes */
 typedef enum {
-    ModeZebra
+    ModeZebra,
+    ModeText
 } Mode;
 
-Mode mode = ModeZebra;
+Mode mode = ModeText;
 
 /* zebra mode */
 
@@ -17,6 +18,12 @@ Mode mode = ModeZebra;
 
 uint8_t zebra_phase = 0;
 uint32_t zebra_t = 0;
+
+/* text mode */
+
+uint8_t render_textmode(uint8_t x, uint8_t y);
+
+/* common */
 
 void init_render() {
 
@@ -30,6 +37,10 @@ uint8_t render_pixel(uint32_t t, uint8_t column_counter, uint8_t row_counter) {
             } else {
                 return 0;
             }
+        break;
+
+        case ModeText:
+            return render_textmode(column_counter, row_counter);
         break;
 
         default:
@@ -58,22 +69,24 @@ uint8_t handle_tick() {
 
     static uint32_t t = 0;
 
+    uint8_t res = render_pixel(t, column_counter, row_counter);
+
     t++;
 
     column_counter++;
 
     if(column_counter == DISPLAY_WIDTH) {
+        render_row(t, row_counter);
+
         column_counter = 0;
         row_counter++;
-
-        render_row(t, row_counter);
     }
 
     if(row_counter == DISPLAY_HEIGHT) {
-        row_counter = 0;
-
         render_frame(t);
+
+        row_counter = 0;
     }
 
-    return render_pixel(t, column_counter, row_counter);
+    return res;
 }
