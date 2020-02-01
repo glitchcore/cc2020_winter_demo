@@ -5,12 +5,13 @@ SOURCES_DIR = .
 BUILD_DIR = build
 
 C_SOURCES =  \
-demo.c \
-main.c \
-textmode.c
+../src/demo.c \
+..src/textmode.c \
+main.c
 
 C_INCLUDES = \
--I.
+-I. \
+-I../src/
 
 CC = gcc
 

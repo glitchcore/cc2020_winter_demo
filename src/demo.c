@@ -74,6 +74,10 @@ void render_frame(uint32_t t) {
         break;
     }
 
+    if(t > 50000) {
+        mode = ModeZebra;
+    }
+
 }
 
 uint8_t handle_tick() {

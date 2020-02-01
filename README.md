@@ -5,7 +5,7 @@
 
 # Build & run
 
-`make`
+`cd platform_linux && make`
 
 `./build/demo`
 
