@@ -9,6 +9,12 @@ uint8_t row_counter = 0;
 uint8_t zebra_phase = 0;
 uint32_t zebra_t = 0;
 
+typedef enum {
+    ModeZebra
+} Mode;
+
+Mode mode = ModeZebra;
+
 #define ZEBRA_PERIOD 3000
 #define ZEBRA_LENGTH 6
 
@@ -42,12 +48,17 @@ uint8_t render_pixel() {
         }
     }
 
-    // printf("%d\n", zebra_phase);
+    switch(mode) {
+        case ModeZebra:
+            if((column_counter + zebra_phase) % ZEBRA_LENGTH == 0) {
+                return 1;
+            } else {
+                return 0;
+            }
+        break;
 
-    if((column_counter + zebra_phase) % ZEBRA_LENGTH == 0) {
-        return 1;
-    } else {
-        return 0;
+        default:
+        break;
     }
 
     return 1;
