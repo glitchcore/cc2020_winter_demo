@@ -1,6 +1,6 @@
 DEVICE = attiny85
 CLOCK = 8000000
-PROGRAMMER = -c usbtiny
+PROGRAMMER = -c avrisp
 
 # for ATTiny85
 # see http://www.engbedded.com/fusecalc/

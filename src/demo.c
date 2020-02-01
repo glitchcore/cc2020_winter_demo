@@ -21,13 +21,14 @@ uint32_t zebra_t = 0;
 
 /* text mode */
 
-uint8_t render_textmode(uint8_t x, uint8_t y);
-void update_text(uint32_t t);
+uint8_t textmode_render(uint8_t x, uint8_t y);
+void textmode_update(uint32_t t);
+void textmode_init();
 
 /* common */
 
 void init_render() {
-
+    textmode_init();
 }
 
 uint8_t render_pixel(uint32_t t, uint8_t column_counter, uint8_t row_counter) {
@@ -41,7 +42,7 @@ uint8_t render_pixel(uint32_t t, uint8_t column_counter, uint8_t row_counter) {
         break;
 
         case ModeText:
-            return render_textmode(column_counter, row_counter);
+            return textmode_render(column_counter, row_counter);
         break;
 
         default:
@@ -67,7 +68,7 @@ void render_frame(uint32_t t) {
         break;
 
         case ModeText:
-            update_text(t);
+            textmode_update(t);
         break;
 
         default:
