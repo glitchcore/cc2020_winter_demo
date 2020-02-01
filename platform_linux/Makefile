@@ -11,12 +11,12 @@ main.c
 
 C_INCLUDES = \
 -I. \
--I../src/
+-I../src \
+-I../fonts
 
 CC = gcc
 
 LDFLAGS = 
-
 
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(C_SOURCES)))
