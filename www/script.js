@@ -1,9 +1,9 @@
 const DEMO_SAMPLE_RATE = 14400;
 
-let freq = 120;
+let kick_freq = 400;
+let bass_freq = 80;
 
-let kick_freq = 120 * 3;
-let bass_freq = 120;
+let freq = bass_freq;
 
 let trance_time = 0;
 const trance_period = 0.1 * DEMO_SAMPLE_RATE;
@@ -26,6 +26,8 @@ const lead_period = kick_period / 2;
 
 let noise = 0;
 
+let phase = 0;
+
 function render_sound(t) {
     let saw_a = 1000;
     let pwm_saw = (t / 30) % 1000;
@@ -35,6 +37,7 @@ function render_sound(t) {
 
     pwm = pwm > 900 ? 900 : pwm;
 
+    /*
     if(t - trance_time > trance_period) {
         trance_time = t;
     }
@@ -50,6 +53,7 @@ function render_sound(t) {
     if(t - lead_time < lead_period / 4) {
         freq = bass_freq * 1.5;
     }
+    */
 
     if(t - kick_time > kick_period) {
         kick_time = t;
@@ -57,16 +61,15 @@ function render_sound(t) {
         freq = kick_freq;
     }
 
+    /*
     if(t - freq_change_time > freq_change_period) {
         freq_change_time = t;
 
         bass_freq = 100 + Math.random() * 50;
 
-        /*
-        if(bass_freq > 440) {
+        if(bass_freq > 440 && false) {
             bass_freq = 120;
         }
-        */
 
         kick_freq = bass_freq * 3;
     }
@@ -94,15 +97,42 @@ function render_sound(t) {
     }
 
     let saw = (t * freq * saw_a / DEMO_SAMPLE_RATE) % (2 * saw_a);
+    */
+
+    if(freq > bass_freq) {
+        freq -= 3000 * (1 / DEMO_SAMPLE_RATE);
+    } 
+
+    phase += (1/DEMO_SAMPLE_RATE) * freq;
 
     if(freq != bass_freq) {
         pwm = 500;
     }
 
-    let pulse = saw > pwm ? 1 : 0;
+    let saw_wave = ((phase / 1.5) % 2) * 1000;
 
-    return pulse;
+    let pulse_wave = saw_wave > pwm ? 1 : 0;
+
+    return pulse_wave;
 }
+
+/*
+function render_sound(t) {
+    if(freq > 110) {
+        freq -= 8000 * (1 / 44100);
+        // freqs.push(f);
+    } 
+    
+
+    phase += (1/44100) * freq; //  = t * base_freq * 2 * Math.PI + 100 * mod;
+
+    let saw_wave = phase % 2 - 1;
+
+    let square_wave = saw_wave > 0.5 ? 1 : 0;
+
+    return  1 * square_wave;
+}
+*/
 
 function play() {
     var context = new AudioContext();
