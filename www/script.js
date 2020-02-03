@@ -1,28 +1,26 @@
 const DEMO_SAMPLE_RATE = 14400;
 
-let kick_freq = 400;
-let bass_freq = 80;
+let kick_freq = 300;
+let bass_freq = 50;
 
 let freq = bass_freq;
 
 let trance_time = 0;
 const trance_period = 0.1 * DEMO_SAMPLE_RATE;
 
-let kick_time = 0;// trance_period;
+let kick_time = trance_period / 2;// trance_period;
 const kick_period = trance_period * 4;
 
 let freq_change_time = 0;
 const freq_change_period = trance_period * 16;
 
-let kick_decay_time = 0;
-const kick_decay_period = 0.004 * DEMO_SAMPLE_RATE;
-const kick_decay = 15; 
+let snare_time = -kick_period / 1.1;
+const snare_period = kick_period * 2;
 
-let snare_time = kick_decay_period * 4;
-const snare_period = kick_period * 4;
+let lead_time = kick_period / 2;
+let lead_period = kick_period / 3; 
 
-let lead_time = 0
-const lead_period = kick_period / 2; 
+let lead_multiplier = 2;
 
 let noise = 0;
 
@@ -30,14 +28,13 @@ let phase = 0;
 
 function render_sound(t) {
     let saw_a = 1000;
-    let pwm_saw = (t / 30) % 1000;
-    let pwm = 200 + (pwm_saw < 500 ? pwm_saw : (1000 - pwm_saw));
+    let pwm_saw = (t / 100) % 1000;
+    let pwm = 500; // 200 + (pwm_saw < 500 ? pwm_saw : (1000 - pwm_saw));
 
     pwm = pwm < 100 ? 100 : pwm;
 
     pwm = pwm > 900 ? 900 : pwm;
 
-    /*
     if(t - trance_time > trance_period) {
         trance_time = t;
     }
@@ -48,10 +45,14 @@ function render_sound(t) {
 
     if(t - lead_period - lead_time > lead_period) {
         lead_time = t;
+        lead_multiplier = 3.9; //Math.round(Math.random() * 5 + 1);
+        lead_period = kick_period / 6;//  Math.round(Math.random() * 6 + 1);
     }
 
+    /*
+    // lead sound
     if(t - lead_time < lead_period / 4) {
-        freq = bass_freq * 1.5;
+        freq = bass_freq * lead_multiplier;
     }
     */
 
@@ -61,33 +62,26 @@ function render_sound(t) {
         freq = kick_freq;
     }
 
-    /*
     if(t - freq_change_time > freq_change_period) {
         freq_change_time = t;
 
-        bass_freq = 100 + Math.random() * 50;
+        // bass_freq = 50 + Math.random() * 30;
 
+        /*
         if(bass_freq > 440 && false) {
             bass_freq = 120;
         }
+        */
 
-        kick_freq = bass_freq * 3;
-    }
-
-    if(t - kick_decay_time > kick_decay_period) {
-        kick_decay_time = t;
-
-        if(freq <= bass_freq) {
-            freq = bass_freq;
-        } else {
-            freq -= kick_decay;
-        }
+        kick_freq = bass_freq * 10;
     }
 
     if(t - snare_time > snare_period) {
         snare_time = t;
     }
 
+    /* 
+    // snare sound
     if(t - snare_time < 0.04 * DEMO_SAMPLE_RATE) {
         if(t % 5 == 0) {
             noise = Math.random() > 0.5 ? 1 : 0;
@@ -95,17 +89,15 @@ function render_sound(t) {
 
         return noise;
     }
-
-    let saw = (t * freq * saw_a / DEMO_SAMPLE_RATE) % (2 * saw_a);
     */
 
     if(freq > bass_freq) {
-        freq -= 3000 * (1 / DEMO_SAMPLE_RATE);
+        freq -= (kick_freq / 0.15) * (1 / DEMO_SAMPLE_RATE);
     } 
 
     phase += (1/DEMO_SAMPLE_RATE) * freq;
 
-    if(freq != bass_freq) {
+    if(freq > bass_freq) {
         pwm = 500;
     }
 
@@ -115,24 +107,6 @@ function render_sound(t) {
 
     return pulse_wave;
 }
-
-/*
-function render_sound(t) {
-    if(freq > 110) {
-        freq -= 8000 * (1 / 44100);
-        // freqs.push(f);
-    } 
-    
-
-    phase += (1/44100) * freq; //  = t * base_freq * 2 * Math.PI + 100 * mod;
-
-    let saw_wave = phase % 2 - 1;
-
-    let square_wave = saw_wave > 0.5 ? 1 : 0;
-
-    return  1 * square_wave;
-}
-*/
 
 function play() {
     var context = new AudioContext();
