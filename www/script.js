@@ -45,13 +45,14 @@ function render_sound(t) {
 
     if(t - lead_period - lead_time > lead_period) {
         lead_time = t;
-        lead_multiplier = 3.9; //Math.round(Math.random() * 5 + 1);
+        lead_multiplier = Math.round(Math.random() * 5 + 1);
         lead_period = kick_period / 6;//  Math.round(Math.random() * 6 + 1);
     }
 
-    /*
+    
     // lead sound
-    if(t - lead_time < lead_period / 4) {
+    /*
+    if(t - lead_time < lead_period / 8) {
         freq = bass_freq * lead_multiplier;
     }
     */
@@ -65,7 +66,7 @@ function render_sound(t) {
     if(t - freq_change_time > freq_change_period) {
         freq_change_time = t;
 
-        // bass_freq = 50 + Math.random() * 30;
+        bass_freq = 50 + Math.random() * 30;
 
         /*
         if(bass_freq > 440 && false) {
@@ -73,7 +74,7 @@ function render_sound(t) {
         }
         */
 
-        kick_freq = bass_freq * 10;
+        //kick_freq = bass_freq * 10;
     }
 
     if(t - snare_time > snare_period) {

@@ -1,35 +1,35 @@
-// main.c
-// 
-// A simple blinky program for ATtiny85
-// Connect red LED at pin 2 (PB3)
-//
-// electronut.in
-
 #include <avr/io.h>
 #include <util/delay.h>
- 
- 
+#include <avr/interrupt.h>
+
+uint8_t handle_tick();
+void init_render();
+
+ISR(TIMER0_COMPA_vect) {
+    if(handle_tick() > 0) {
+        PORTB = 0b00000010;
+    } else {
+        PORTB = 0b00000000;
+    }
+
+    // PORTB ^= 0b00000010;
+}
+
 int main() {
-    // set PB3 to be output
-    DDRB = 0b00001000;
+    init_render();
+
+    // set PB1 to be output
+    DDRB = 0b00000010;
+
+    TCCR0A = (1 << WGM01); //CTC mode
+    TCCR0B = (2 << CS00);  //div8
+    OCR0A = 16000000/8 * 0.000061 - 1; // 50us compare value
+    TIMSK |= (1<<OCIE0A); // if you want interrupt
+
+    sei();
 
     while (1) {
-        // flash# 1:
-        // set PB3 high
-        PORTB = 0b00001000; 
-        _delay_ms(20);
-        // set PB3 low
-        PORTB = 0b00000000;
-        _delay_ms(20);
-
-        // flash# 2:
-        // set PB3 high
-        PORTB = 0b00001000; 
-        _delay_ms(200);
-        // set PB3 low
-        PORTB = 0b00000000;
-
-        _delay_ms(200);
+        _delay_ms(10);
     }
 
     return 1;

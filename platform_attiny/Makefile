@@ -4,10 +4,10 @@ PROGRAMMER = -c avrisp
 
 # for ATTiny85
 # see http://www.engbedded.com/fusecalc/
-FUSES       = -U lfuse:w:0x62:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
+FUSES       = -U lfuse:w:0xc1:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
 
-AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
-COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
+AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE) -P /dev/ttyACM0 -b 19200
+COMPILE = avr-gcc -Wall -O0 -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
 
 TARGET = demo
 
@@ -15,14 +15,15 @@ SOURCES_DIR = .
 BUILD_DIR = build
 
 C_SOURCES =  \
-main.c
-# ../src/demo.c \
-# ..src/textmode.c \
+main.c \
+../src/demo.c \
+..src/textmode.c
 
 
 C_INCLUDES = \
 -I. \
--I../src/
+-I../src/ \
+-I../fonts
 
 CC = gcc
 
@@ -56,7 +57,7 @@ clean:
 -include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
 
 flash: $(BUILD_DIR)/$(TARGET).hex
-	$(AVRDUDE) -U flash:w:$@:i
+	$(AVRDUDE) -U flash:w:$^:i
 
 fuse:
 	$(AVRDUDE) $(FUSES)

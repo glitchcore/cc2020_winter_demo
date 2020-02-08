@@ -4,12 +4,10 @@
 #include <stdio.h>
 
 /* modes */
-typedef enum {
-    ModeZebra,
-    ModeText
-} Mode;
+#define ModeZebra 0
+#define ModeText 1
 
-Mode mode = ModeText;
+uint8_t mode = ModeZebra;
 
 /* zebra mode */
 
@@ -17,7 +15,7 @@ Mode mode = ModeText;
 #define ZEBRA_LENGTH 6
 
 uint8_t zebra_phase = 0;
-uint32_t zebra_t = 0;
+uint8_t zebra_t = 0;
 
 /* text mode */
 
@@ -28,14 +26,17 @@ void textmode_init();
 /* common */
 
 void init_render() {
+    mode = ModeZebra;
+
     textmode_init();
 }
 
 uint8_t render_pixel(uint32_t t, uint8_t column_counter, uint8_t row_counter) {
+    /*
     switch(mode) {
         case ModeZebra:
             if((column_counter + zebra_phase) % ZEBRA_LENGTH == 0) {
-                return 1;
+                return 0;
             } else {
                 return 0;
             }
@@ -46,8 +47,12 @@ uint8_t render_pixel(uint32_t t, uint8_t column_counter, uint8_t row_counter) {
         break;
 
         default:
+            return 1;
         break;
     }
+    */
+
+    return mode;
 }
 
 void render_row(uint32_t t, uint8_t row_counter) {
@@ -90,6 +95,7 @@ uint8_t handle_tick() {
 
     uint8_t res = render_pixel(t, column_counter, row_counter);
 
+    /*
     t++;
 
     column_counter++;
@@ -106,6 +112,7 @@ uint8_t handle_tick() {
 
         row_counter = 0;
     }
+    */
 
-    return res;
+    return mode;
 }
