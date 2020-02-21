@@ -6,7 +6,8 @@
 /* modes */
 typedef enum {
     ModeZebra,
-    ModeText
+    ModeText,
+    ModePoint,
 } Mode;
 
 Mode mode = ModeText;
@@ -45,9 +46,19 @@ uint8_t render_pixel(uint32_t t, uint8_t column_counter, uint8_t row_counter) {
             return textmode_render(column_counter, row_counter);
         break;
 
+        case ModePoint:
+            if(column_counter == 0 && row_counter == 0) {
+                return 1;
+            } else {
+                return 0;
+            }
+        break;
+
         default:
         break;
     }
+
+    return 0;
 }
 
 void render_row(uint32_t t, uint8_t row_counter) {
@@ -88,7 +99,7 @@ uint8_t handle_tick() {
 
     static uint32_t t = 0;
 
-    uint8_t res = render_pixel(t, column_counter, row_counter);
+    uint8_t res = render_pixel(t, DISPLAY_WIDTH - column_counter, row_counter);
 
     t++;
 

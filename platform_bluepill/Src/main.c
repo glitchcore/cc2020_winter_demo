@@ -61,12 +61,12 @@ void init_render();
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+  HAL_GPIO_TogglePin(DEMO_GPIO_Port, DEMO_Pin);
 
   if(handle_tick() > 0) {
-    HAL_GPIO_WritePin(DEMO_GPIO_Port, DEMO_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
   } else {
-    HAL_GPIO_WritePin(DEMO_GPIO_Port, DEMO_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
   }
 }
 /* USER CODE END 0 */
