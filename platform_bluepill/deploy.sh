@@ -1,0 +1,1 @@
+st-flash write build/platform_bluepill.bin 0x08000000
