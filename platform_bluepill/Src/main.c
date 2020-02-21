@@ -53,11 +53,22 @@ static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
 /* USER CODE BEGIN PFP */
 
+uint8_t handle_tick();
+void init_render();
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 
+  if(handle_tick() > 0) {
+    HAL_GPIO_WritePin(DEMO_GPIO_Port, DEMO_Pin, GPIO_PIN_RESET);
+  } else {
+    HAL_GPIO_WritePin(DEMO_GPIO_Port, DEMO_Pin, GPIO_PIN_SET);
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -92,6 +103,10 @@ int main(void)
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
+  init_render();
+
+  HAL_TIM_Base_Start_IT(&htim1);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -101,12 +116,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    /*
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(DEMO_GPIO_Port, DEMO_Pin, GPIO_PIN_SET);
     HAL_Delay(100);
-    HAL_GPIO_WritePin(DEMO_GPIO_Port, DEMO_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
     HAL_Delay(100);
+    */
   }
   /* USER CODE END 3 */
 }
@@ -167,9 +182,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 0;
+  htim1.Init.Prescaler = 32;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 0;
+  htim1.Init.Period = 61 - 3;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
