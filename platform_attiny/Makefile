@@ -1,66 +1,20 @@
-DEVICE = attiny85
-CLOCK = 8000000
-PROGRAMMER = -c avrisp
+CC=avr-gcc
+OBJCOPY=avr-objcopy
+AVRDUDE=avrdude
+MCU=attiny13
+CFLAGS=-std=c99 -Wall -g -Os -mmcu=${MCU} -I. -I../src/ -I../fonts
 
-# for ATTiny85
-# see http://www.engbedded.com/fusecalc/
-FUSES       = -U lfuse:w:0x62:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
+all: main.hex
 
-AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
-COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
+main.hex: main.o
+	${OBJCOPY} -j .text -j .data -O ihex main.o main.hex
+	avr-size -C --mcu=${MCU} main.o
 
-TARGET = demo
+main.o: main.c ../src/demo.c
+	${CC} ${CFLAGS} -o main.o main.c ../src/demo.c
 
-SOURCES_DIR = .
-BUILD_DIR = build
-
-C_SOURCES =  \
-main.c
-# ../src/demo.c \
-# ..src/textmode.c \
-
-
-C_INCLUDES = \
--I. \
--I../src/
-
-CC = gcc
-
-LDFLAGS = 
-
-all: $(BUILD_DIR)/$(TARGET).hex
-
-OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
-vpath %.c $(sort $(dir $(C_SOURCES)))
-
-$(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) 
-	$(COMPILE) -c $(C_INCLUDES) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
-
-$(BUILD_DIR)/$(TARGET): $(OBJECTS) Makefile
-	$(COMPILE) $(OBJECTS) $(LDFLAGS) -o $@
-
-$(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
-	$(COMPILE) $(OBJECTS) $(LDFLAGS) -o $@
-
-$(BUILD_DIR):
-	mkdir $@
-
-$(BUILD_DIR)/$(TARGET).hex: $(BUILD_DIR)/$(TARGET).elf
-	rm -f $@
-	avr-objcopy -j .text -j .data -O ihex $< $@
-	avr-size --format=avr --mcu=$(DEVICE) $<
+flash: main.hex
+	${AVRDUDE} -p ${MCU} -P /dev/ttyUSB0 -c avrisp -b 19200 -U flash:w:main.hex:i
 
 clean:
-	-rm -fR .dep $(BUILD_DIR)
-
--include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
-
-flash: $(BUILD_DIR)/$(TARGET).hex
-	$(AVRDUDE) -U flash:w:$@:i
-
-fuse:
-	$(AVRDUDE) $(FUSES)
-
-# Targets for code debugging and analysis:
-disasm:	$(BUILD_DIR)/$(TARGET).elf
-	avr-objdump -d $@
+	rm -f *.o *.hex

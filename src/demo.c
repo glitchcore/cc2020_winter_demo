@@ -10,7 +10,8 @@ typedef enum {
     ModePoint,
 } Mode;
 
-Mode mode = ModeText;
+Mode mode = ModePoint;
+uint16_t num_pixel = 0;
 
 /* zebra mode */
 
@@ -29,25 +30,29 @@ void textmode_init();
 /* common */
 
 void init_render() {
-    textmode_init();
+    // textmode_init();
 }
 
-uint8_t render_pixel(uint32_t t, uint8_t column_counter, uint8_t row_counter) {
+uint8_t render_pixel(uint32_t t, uint8_t x, uint8_t y) {
     switch(mode) {
         case ModeZebra:
-            if((column_counter + zebra_phase) % ZEBRA_LENGTH == 0) {
+            if((x + zebra_phase) % ZEBRA_LENGTH == 0) {
                 return 1;
             } else {
                 return 0;
             }
         break;
 
-        case ModeText:
-            return textmode_render(column_counter, row_counter);
-        break;
+        /*case ModeText:
+            return textmode_render(x, y);
+        break;*/
 
         case ModePoint:
-            if(column_counter == 0 && row_counter == 0) {
+            if(
+                x == 0 || y == 0 ||
+                x == (DISPLAY_WIDTH - 1) || y == (DISPLAY_HEIGHT - 1) ||
+                (x + y * DISPLAY_WIDTH) == num_pixel
+            ) {
                 return 1;
             } else {
                 return 0;
@@ -61,7 +66,7 @@ uint8_t render_pixel(uint32_t t, uint8_t column_counter, uint8_t row_counter) {
     return 0;
 }
 
-void render_row(uint32_t t, uint8_t row_counter) {
+void render_row(uint32_t t, uint8_t y) {
 
 }
 
@@ -78,9 +83,15 @@ void render_frame(uint32_t t) {
             }
         break;
 
-        case ModeText:
+        /*case ModeText:
             textmode_update(t);
-        break;
+        break;*/
+
+        case ModePoint:
+            num_pixel++;
+            if(num_pixel == DISPLAY_WIDTH * DISPLAY_HEIGHT) {
+                num_pixel = 0;
+            }
 
         default:
         break;
@@ -99,7 +110,11 @@ uint8_t handle_tick() {
 
     static uint32_t t = 0;
 
-    uint8_t res = render_pixel(t, DISPLAY_WIDTH - column_counter, row_counter);
+#ifdef FLIP_DISPLAY
+    uint8_t res = render_pixel(t, DISPLAY_WIDTH - column_counter - 1, row_counter);
+#else
+    uint8_t res = render_pixel(t, column_counter, row_counter);
+#endif
 
     t++;
 

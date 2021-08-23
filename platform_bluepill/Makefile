@@ -103,7 +103,8 @@ AS_DEFS =
 # C defines
 C_DEFS =  \
 -DUSE_HAL_DRIVER \
--DSTM32F103xB
+-DSTM32F103xB \
+-DFLIP_DISPLAY
 
 
 # AS includes

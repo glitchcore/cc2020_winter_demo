@@ -29,6 +29,7 @@ void textmode_init() {
 }
 
 uint8_t render_char(uint8_t x, uint8_t y, uint8_t ch) {
+    
     if(x >= CHAR_WIDTH || y >= CHAR_HEIGHT) {
         return 0;
     }
@@ -45,9 +46,12 @@ uint8_t render_char(uint8_t x, uint8_t y, uint8_t ch) {
 }
 
 uint8_t textmode_render(uint8_t x, uint8_t y) {
+    /*
+    // рамка 
     if(x == 0 ||  y == 0 || y == (DISPLAY_WIDTH - 1)) {
         return 1;
     }
+    */
 
     uint8_t char_pos_x = x / CHAR_WIDTH;
     uint8_t char_pos_y = y / CHAR_HEIGHT;

@@ -1,4 +1,6 @@
 #define DISPLAY_WIDTH 30
-#define DISPLAY_HEIGHT 24
+#define DISPLAY_HEIGHT 16
+
+#define FLIP_DISPLAY 1
 
 #define PIXEL_PERIOD 69
