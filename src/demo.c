@@ -12,8 +12,8 @@ typedef enum {
 #define ZEBRA_PERIOD 2
 #define ZEBRA_LENGTH 8
 
-#define ZEBRA_TIME 24 * 4
-#define TEXT_TIME 24 * 8
+#define ZEBRA_TIME 24 * 10
+#define TEXT_TIME 24 * 16
 
 /* common */
 
@@ -68,7 +68,7 @@ static inline void render_pixel(uint16_t t, uint8_t x, uint8_t y) {
             if(
                 x == 0 || y == 0 ||
                 x == (DISPLAY_WIDTH - 1) || y == (DISPLAY_HEIGHT - 1) ||
-                (x + y * DISPLAY_WIDTH) == num_pixel
+                (x + y * DISPLAY_WIDTH) < num_pixel
             ) {
                 pixel_value = 1;
             } else {
@@ -102,7 +102,7 @@ static inline void render_frame(uint16_t t) {
         break;
 
         case ModePoint:
-            num_pixel++;
+            num_pixel += 2;
             if(num_pixel == DISPLAY_WIDTH * DISPLAY_HEIGHT) {
                 num_pixel = 0;
             }
