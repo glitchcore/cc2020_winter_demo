@@ -9,25 +9,21 @@ typedef enum {
 
 /* zebra mode */
 
-#define ZEBRA_PERIOD 3000
-#define ZEBRA_LENGTH 6
-
-/* text mode */
-
-uint8_t textmode_render(uint8_t x, uint8_t y);
-void textmode_update(uint32_t t);
-void textmode_init();
+#define ZEBRA_PERIOD 2
+#define ZEBRA_LENGTH 8
 
 /* common */
 
 REG_8(column_counter, "r3");
 REG_8(row_counter, "r4");
-REG_8(t, "r5");
+NOINIT uint16_t t;
 REG_8(pixel_value, "r6");
 REG_8(mode, "r7");
 REG_8(zebra_phase, "r8");
-REG_8(zebra_t, "r9");
+NOINIT uint16_t zebra_t;
 NOINIT uint16_t num_pixel;
+
+#include "textmode.c"
 
 static inline void init_render() {
     column_counter = 0;
@@ -37,22 +33,33 @@ static inline void init_render() {
     mode = ModePoint;
     zebra_phase = 0;
     zebra_t = 0;
-    num_pixel = 0;
+
+    num_pixel = DISPLAY_WIDTH;
+
+    textmode_init();
+}
+
+static inline void render_zebra(uint16_t t, uint8_t x, uint8_t y) {
+    if((x + zebra_phase) % ZEBRA_LENGTH < 4) {
+        pixel_value = 1;
+    } else {
+        // pixel_value = 0;
+    }
 }
 
 static inline void render_pixel(uint16_t t, uint8_t x, uint8_t y) {
     switch(mode) {
         case ModeZebra:
-            if((x + zebra_phase) % ZEBRA_LENGTH == 0) {
-                pixel_value = 1;
-            } else {
-                pixel_value = 0;
-            }
+            render_zebra(t, x, y);
         break;
 
-        /*case ModeText:
-            return textmode_render(x, y);
-        break;*/
+        case ModeText:
+            if(y > 3 && y < CHAR_HEIGHT + 5) {
+                textmode_render(x, y - 5);
+            } else {
+                render_zebra(t, x, y);
+            }
+        break;
 
         case ModePoint:
             if(
@@ -62,12 +69,12 @@ static inline void render_pixel(uint16_t t, uint8_t x, uint8_t y) {
             ) {
                 pixel_value = 1;
             } else {
-                pixel_value = 0;
+                // pixel_value = 0;
             }
         break;
 
         default:
-            pixel_value = 0;
+            // pixel_value = 0;
         break;
     }
 }
@@ -77,37 +84,41 @@ static inline void render_row(uint16_t t, uint8_t y) {
 }
 
 static inline void render_frame(uint16_t t) {
+    if(t > zebra_t + ZEBRA_PERIOD) {
+        zebra_t = t;
+
+        zebra_phase++;
+        if(zebra_phase == ZEBRA_LENGTH + 1) {
+            zebra_phase = 1;
+        }
+    }
+
     switch(mode) {
-        case ModeZebra:
-            if(t > zebra_t + ZEBRA_PERIOD) {
-                zebra_t = t;
-
-                zebra_phase++;
-                if(zebra_phase == ZEBRA_LENGTH + 1) {
-                    zebra_phase = 1;
-                }
-            }
-        break;
-
-        /*case ModeText:
+        case ModeText:
             textmode_update(t);
-        break;*/
+        break;
 
         case ModePoint:
             num_pixel++;
             if(num_pixel == DISPLAY_WIDTH * DISPLAY_HEIGHT) {
                 num_pixel = 0;
             }
-
         default:
         break;
     }
 
-    /*
-    if(t > 50000) {
+    // scene sequencer
+#if 1
+    if(t > 24 * 8) {
+        mode = ModeText;
+    } else if(t > 24 * 4) {
         mode = ModeZebra;
+    } else {
+        mode = ModePoint;
     }
-    */
+#else
+    mode = ModeText;
+#endif
 }
 
 static inline void handle_tick() {
@@ -119,8 +130,6 @@ static inline void handle_tick() {
     render_pixel(t, column_counter, row_counter);
 #endif
 
-    t++;
-
     column_counter++;
 
     if(column_counter == DISPLAY_WIDTH) {
@@ -131,6 +140,7 @@ static inline void handle_tick() {
     }
 
     if(row_counter == DISPLAY_HEIGHT) {
+        t++;
         render_frame(t);
 
         row_counter = 0;

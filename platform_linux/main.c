@@ -7,6 +7,7 @@
 
 #define REG_8(NAME,REG) uint8_t NAME
 #define NOINIT
+#define __flash
 
 #include "demo.c"
 

@@ -12,7 +12,7 @@ CC = gcc
 
 LDFLAGS = 
 
-$(TARGET): main.c ../src/demo.c Makefile
+$(TARGET): main.c ../src/demo.c ../src/textmode.c  Makefile
 	$(CC) $(C_INCLUDES) $(LDFLAGS) -o $@ $<
 
 clean:

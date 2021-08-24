@@ -12,7 +12,7 @@ main.hex: main.o
 	avr-size -C --mcu=${MCU} main.o
 	avr-objdump -d main.o > main.asm
 
-main.o: main.c ../src/demo.c
+main.o: main.c ../src/demo.c ../src/textmode.c
 	${CC} ${CFLAGS} -o main.o main.c
 
 flash: main.hex
