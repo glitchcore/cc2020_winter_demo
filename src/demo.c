@@ -1,7 +1,4 @@
-#include <stdint.h>
 #include "config.h"
-
-#include <stdio.h>
 
 /* modes */
 typedef enum {
@@ -10,16 +7,10 @@ typedef enum {
     ModePoint,
 } Mode;
 
-Mode mode = ModePoint;
-uint16_t num_pixel = 0;
-
 /* zebra mode */
 
 #define ZEBRA_PERIOD 3000
 #define ZEBRA_LENGTH 6
-
-uint8_t zebra_phase = 0;
-uint32_t zebra_t = 0;
 
 /* text mode */
 
@@ -29,17 +20,33 @@ void textmode_init();
 
 /* common */
 
-void init_render() {
-    // textmode_init();
+REG_8(column_counter, "r3");
+REG_8(row_counter, "r4");
+REG_8(t, "r5");
+REG_8(pixel_value, "r6");
+REG_8(mode, "r7");
+REG_8(zebra_phase, "r8");
+REG_8(zebra_t, "r9");
+NOINIT uint16_t num_pixel;
+
+static inline void init_render() {
+    column_counter = 0;
+    row_counter = 0;
+    t = 0;
+    pixel_value = 0;
+    mode = ModePoint;
+    zebra_phase = 0;
+    zebra_t = 0;
+    num_pixel = 0;
 }
 
-uint8_t render_pixel(uint32_t t, uint8_t x, uint8_t y) {
+static inline void render_pixel(uint16_t t, uint8_t x, uint8_t y) {
     switch(mode) {
         case ModeZebra:
             if((x + zebra_phase) % ZEBRA_LENGTH == 0) {
-                return 1;
+                pixel_value = 1;
             } else {
-                return 0;
+                pixel_value = 0;
             }
         break;
 
@@ -53,24 +60,23 @@ uint8_t render_pixel(uint32_t t, uint8_t x, uint8_t y) {
                 x == (DISPLAY_WIDTH - 1) || y == (DISPLAY_HEIGHT - 1) ||
                 (x + y * DISPLAY_WIDTH) == num_pixel
             ) {
-                return 1;
+                pixel_value = 1;
             } else {
-                return 0;
+                pixel_value = 0;
             }
         break;
 
         default:
+            pixel_value = 0;
         break;
     }
-
-    return 0;
 }
 
-void render_row(uint32_t t, uint8_t y) {
+static inline void render_row(uint16_t t, uint8_t y) {
 
 }
 
-void render_frame(uint32_t t) {
+static inline void render_frame(uint16_t t) {
     switch(mode) {
         case ModeZebra:
             if(t > zebra_t + ZEBRA_PERIOD) {
@@ -104,16 +110,13 @@ void render_frame(uint32_t t) {
     */
 }
 
-uint8_t handle_tick() {
-    static uint8_t column_counter = 0;
-    static uint8_t row_counter = 0;
-
-    static uint32_t t = 0;
+static inline void handle_tick() {
+    pixel_value = 0;
 
 #ifdef FLIP_DISPLAY
-    uint8_t res = render_pixel(t, DISPLAY_WIDTH - column_counter - 1, row_counter);
+    render_pixel(t, DISPLAY_WIDTH - column_counter - 1, row_counter);
 #else
-    uint8_t res = render_pixel(t, column_counter, row_counter);
+    render_pixel(t, column_counter, row_counter);
 #endif
 
     t++;
@@ -132,6 +135,4 @@ uint8_t handle_tick() {
 
         row_counter = 0;
     }
-
-    return res;
 }

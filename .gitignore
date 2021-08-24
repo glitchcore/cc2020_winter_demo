@@ -1,1 +1,10 @@
 build
+*.hex
+*.o
+*.elf
+*.asm
+demo
+*.png
+*.TTF
+*.ttf
+*.pyc

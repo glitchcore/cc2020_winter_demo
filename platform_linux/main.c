@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
-
-#include "config.h"
+#include <stdbool.h>
 
 #define clear() printf("\033[H\033[J")
 
-uint8_t handle_tick();
-void init_render();
+#define REG_8(NAME,REG) uint8_t NAME
+#define NOINIT
+
+#include "demo.c"
 
 int main(int argc, char const *argv[])
 {
@@ -17,12 +18,12 @@ int main(int argc, char const *argv[])
     while(1) {
         for(size_t y = 0; y < DISPLAY_HEIGHT; y++) {
             for(size_t x = 0; x < DISPLAY_WIDTH; x++) {
-                uint8_t ch = handle_tick();
+                handle_tick();
 
-                if(ch == 1) {
+                if(pixel_value == 1) {
                     printf("*");
-                } else if(ch > 1){
-                    printf("%c", ch);
+                } else if(pixel_value > 1){
+                    printf("%c", pixel_value);
                 } else {
                     printf(" ");
                 }
