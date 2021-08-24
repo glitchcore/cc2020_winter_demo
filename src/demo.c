@@ -12,6 +12,9 @@ typedef enum {
 #define ZEBRA_PERIOD 2
 #define ZEBRA_LENGTH 8
 
+#define ZEBRA_TIME 24 * 4
+#define TEXT_TIME 24 * 8
+
 /* common */
 
 REG_8(column_counter, "r3");
@@ -55,7 +58,7 @@ static inline void render_pixel(uint16_t t, uint8_t x, uint8_t y) {
 
         case ModeText:
             if(y > 3 && y < CHAR_HEIGHT + 5) {
-                textmode_render(x, y - 5);
+                textmode_render(x + (t - TEXT_TIME) / 2 - 30, y - 5);
             } else {
                 render_zebra(t, x, y);
             }
@@ -109,9 +112,9 @@ static inline void render_frame(uint16_t t) {
 
     // scene sequencer
 #if 1
-    if(t > 24 * 8) {
+    if(t > TEXT_TIME) {
         mode = ModeText;
-    } else if(t > 24 * 4) {
+    } else if(t > ZEBRA_TIME) {
         mode = ModeZebra;
     } else {
         mode = ModePoint;

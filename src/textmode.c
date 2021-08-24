@@ -12,6 +12,13 @@
 // uint8_t start_text[DISPLAY_CHAR_WIDTH * DISPLAY_CHAR_HEIGHT + 1];
 // uint8_t text[DISPLAY_CHAR_WIDTH * DISPLAY_CHAR_HEIGHT + 1];
 // uint8_t target_text[DISPLAY_CHAR_WIDTH * DISPLAY_CHAR_HEIGHT + 1] = "WELCOME TO CC !";
+const __flash uint8_t text[] = {
+    4, 10, 5, 14, 16, 0,
+    7, 14, 13, 16, 17, 15, 18, 7, 17, 11, 14, 13, 16, 0,
+    3, 1, 3, 2, 0,
+    6, 19, 0,
+    4, 14, 15, 8, 9, 12, 11, 17, 7, 10
+};
 
 // uint8_t text_show_pos = 0;
 
@@ -41,13 +48,13 @@ static inline void render_char(uint8_t x, uint8_t y, uint8_t ch) {
 }
 
 static inline void textmode_render(uint8_t x, uint8_t y) {
-    /*uint8_t char_pos_x = x / CHAR_WIDTH;
-    uint8_t char_pos_y = y / CHAR_HEIGHT;
+    register uint8_t char_pos_x = x / CHAR_WIDTH;
+    // register uint8_t char_pos_y = y / CHAR_HEIGHT;
 
-    uint8_t ch = text[char_pos_y * DISPLAY_CHAR_WIDTH + char_pos_x];*/
+    register uint8_t ch = text[char_pos_x];
 
     // render_char(x % CHAR_WIDTH, y % CHAR_HEIGHT, 1);
-    render_char(x, y % CHAR_HEIGHT, 1);
+    render_char(x % CHAR_WIDTH, y % CHAR_HEIGHT, ch);
 }
 
 static inline void textmode_update(uint16_t t) {
