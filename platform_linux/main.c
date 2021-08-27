@@ -22,9 +22,9 @@ int main(int argc, char const *argv[])
                 handle_tick();
 
                 if(pixel_value == 1) {
-                    printf("*");
-                } else if(pixel_value > 1){
-                    printf("%c", pixel_value);
+                    printf("■");
+                } else if(pixel_value > 1) {
+                    printf("%x", pixel_value);
                 } else {
                     printf(" ");
                 }

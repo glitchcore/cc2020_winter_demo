@@ -3,7 +3,7 @@ OBJCOPY=avr-objcopy
 AVRDUDE=avrdude
 MCU=attiny13
 REGS=-ffixed-3 -ffixed-4 -ffixed-5 -ffixed-6 -ffixed-7 -ffixed-8 -ffixed-9
-CFLAGS= -Wall -g0 -Os -mmcu=${MCU} -I. -I../src/ -I../fonts ${REGS}
+CFLAGS= -Wall -g0 -Os -mmcu=${MCU} -I. -I../src/ -I../fonts ${REGS} -DFLIP_DISPLAY
 
 all: main.hex
 

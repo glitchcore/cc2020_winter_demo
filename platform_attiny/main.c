@@ -13,7 +13,7 @@
 
 #define WHITE (1<<PB3)
 
-__attribute__((naked)) ISR(TIM0_COMPA_vect) {
+ISR(TIM0_COMPA_vect) {
     TCNT0 = 0;
     handle_tick();
     PORTB = (pixel_value & 0x01) << PB3;
@@ -25,7 +25,7 @@ __attribute__ ((OS_main)) void main() {
     // set PB3 to be output
     DDRB = WHITE;
 
-    OCR0A = 94;
+    OCR0A = 86;
     TCNT0 = 0;
 
     // set prescaler to 8 (586 Hz)

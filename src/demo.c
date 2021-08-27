@@ -2,6 +2,7 @@
 
 /* modes */
 typedef enum {
+    ModeEmpty,
     ModeZebra,
     ModeText,
     ModePoint,
@@ -14,9 +15,9 @@ typedef enum {
 
 #define ZEBRA_TIME 24 * 10
 #define TEXT_TIME 24 * 16
+#define LOOP_TIME 24 * 40
 
 /* common */
-
 REG_8(column_counter, "r3");
 REG_8(row_counter, "r4");
 NOINIT uint16_t t;
@@ -51,34 +52,47 @@ static inline void render_zebra(uint16_t t, uint8_t x, uint8_t y) {
 }
 
 static inline void render_pixel(uint16_t t, uint8_t x, uint8_t y) {
-    switch(mode) {
-        case ModeZebra:
-            render_zebra(t, x, y);
-        break;
-
-        case ModeText:
-            if(y > 3 && y < CHAR_HEIGHT + 5) {
-                textmode_render(x + (t - TEXT_TIME) / 2 - 30, y - 5);
-            } else {
+    if(
+        x == -1 || y == -1 ||
+        x == (DISPLAY_WIDTH + 1) || y == (DISPLAY_HEIGHT + 1)
+    ) {
+        pixel_value = 1;
+    } else if(
+        x == 0 || y == 0 ||
+        x == (DISPLAY_WIDTH - 1) || y == (DISPLAY_HEIGHT - 0)
+    ) {
+        // pixel_value = 0;
+    } else {
+        switch(mode) {
+            case ModeZebra:
                 render_zebra(t, x, y);
-            }
-        break;
+            break;
 
-        case ModePoint:
-            if(
-                x == 0 || y == 0 ||
-                x == (DISPLAY_WIDTH - 1) || y == (DISPLAY_HEIGHT - 1) ||
-                (x + y * DISPLAY_WIDTH) < num_pixel
-            ) {
-                pixel_value = 1;
-            } else {
+            case ModeText:
+                if(y >= 0 && y < DISPLAY_HEIGHT + 2) {
+                    textmode_render(x/2 + (t /*- TEXT_TIME*/) / 2 - 1, (y + 1)/2);
+                } else {
+                    // render_zebra(t, x, y);
+                }
+            break;
+
+            case ModePoint:
+                if(
+                    x == 0 || y == 0 ||
+                    x == (DISPLAY_WIDTH - 1) || y == (DISPLAY_HEIGHT - 1) ||
+                    (x + y * DISPLAY_WIDTH) < num_pixel
+                ) {
+                    pixel_value = 1;
+                } else {
+                    // pixel_value = 0;
+                }
+            break;
+
+            case ModeEmpty:
+            default:
                 // pixel_value = 0;
-            }
-        break;
-
-        default:
-            // pixel_value = 0;
-        break;
+            break;
+        }
     }
 }
 
@@ -111,8 +125,10 @@ static inline void render_frame(uint16_t t) {
     }
 
     // scene sequencer
-#if 1
-    if(t > TEXT_TIME) {
+#if 0
+    if(t > LOOP_TIME) {
+        t = 0;
+    } else if(t > TEXT_TIME) {
         mode = ModeText;
     } else if(t > ZEBRA_TIME) {
         mode = ModeZebra;
@@ -128,7 +144,7 @@ static inline void handle_tick() {
     pixel_value = 0;
 
 #ifdef FLIP_DISPLAY
-    render_pixel(t, DISPLAY_WIDTH - column_counter - 1, row_counter);
+    render_pixel(t, column_counter, DISPLAY_HEIGHT - row_counter - 1);
 #else
     render_pixel(t, column_counter, row_counter);
 #endif
